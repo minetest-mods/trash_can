@@ -1,6 +1,6 @@
 minetest.register_node("trash_can:trash_can_wooden",{
 	groups = {snappy=1,choppy=2,oddly_breakable_by_hand=2,flammable=3},
-	tiles = {"default_wood.png"},
+	tiles = {"trash_can_wooden_top.png", "trash_can_wooden_top.png", "trash_can_wooden.png"},
 	description = "Wooden Trash Can",
 	drawtype="nodebox",
 	paramtype = "light",
