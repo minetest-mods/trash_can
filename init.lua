@@ -63,6 +63,7 @@ minetest.register_craft({
 	}
 })
 
+--Unused stuff
 minetest.register_node("trash_can:trash_can_full",{
 	groups = {choppy=2},
 	tiles = {"default_wood.png"},
