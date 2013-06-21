@@ -1,3 +1,5 @@
+--Node Registration
+
 minetest.register_node("trash_can:trash_can_wooden",{
 	groups = {snappy=1,choppy=2,oddly_breakable_by_hand=2,flammable=3},
 	tiles = {"trash_can_wooden_top.png", "trash_can_wooden_top.png", "trash_can_wooden.png"},
@@ -54,6 +56,8 @@ minetest.register_node("trash_can:trash_can_wooden",{
         end,
 })
 
+--Crafting
+
 minetest.register_craft({
 	output = 'trash_can:trash_can_wooden',
 	recipe = {
@@ -63,20 +67,31 @@ minetest.register_craft({
 	}
 })
 
+--Throw In Trash Can Code
+
+local old_on_step = minetest.registered_entities["__builtin:item"].on_step
+minetest.registered_entities["__builtin:item"].on_step = function(self, dtime)
+    if minetest.env:get_node(self.object:getpos()).name == "trash_can:trash_can_wooden" then
+        self.object:remove()
+        return
+    end
+    old_on_step(self, dtime)
+end
+
 --Unused stuff
-minetest.register_node("trash_can:trash_can_full",{
-	groups = {choppy=2},
-	tiles = {"default_wood.png"},
-	drawtype="nodebox",
-	paramtype = "light",
-	node_box = {
-		type = "fixed",
-		fixed = {
-			{-0.375000,-0.500000,0.312500,0.375000,0.500000,0.375000}, --NodeBox 1
-			{0.312500,-0.500000,-0.375000,0.375000,0.500000,0.375000}, --NodeBox 2
-			{-0.375000,-0.500000,-0.375000,0.375000,0.500000,-0.312500}, --NodeBox 3
-			{-0.375000,-0.500000,-0.375000,-0.312500,0.500000,0.375000}, --NodeBox 4
-			{-0.312500,-0.500000,-0.312500,0.312500,0.375000,0.312500}, --NodeBox 5
-		}
-	}
-})
+--minetest.register_node("trash_can:trash_can_full",{
+--	groups = {choppy=2},
+--	tiles = {"default_wood.png"},
+--	drawtype="nodebox",
+--	paramtype = "light",
+--	node_box = {
+--		type = "fixed",
+--		fixed = {
+--			{-0.375000,-0.500000,0.312500,0.375000,0.500000,0.375000}, --NodeBox 1
+--			{0.312500,-0.500000,-0.375000,0.375000,0.500000,0.375000}, --NodeBox 2
+--			{-0.375000,-0.500000,-0.375000,0.375000,0.500000,-0.312500}, --NodeBox 3
+--			{-0.375000,-0.500000,-0.375000,-0.312500,0.500000,0.375000}, --NodeBox 4
+--			{-0.312500,-0.500000,-0.312500,0.312500,0.375000,0.312500}, --NodeBox 5
+--		}
+--	}
+--})
