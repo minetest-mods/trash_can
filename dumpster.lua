@@ -84,7 +84,6 @@ minetest.register_node("trash_can:dumpster", {
 	paramtype = "light",
 	paramtype2 = "facedir",
 	inventory_image = "dumpster_wield.png",
-	wield_image = "dumpster_wield.png",
 	tiles = {
 		"dumpster_top.png", 
 		"dumpster_bottom.png", 
