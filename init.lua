@@ -1,3 +1,7 @@
+--dofiles
+dofile(minetest.get_modpath("trash_can").."/dumpster.lua")
+
+
 --Node Registration
 
 minetest.register_node("trash_can:trash_can_wooden",{
@@ -66,6 +70,7 @@ minetest.register_craft({
 		{'group:wood', 'group:wood', 'group:wood'},
 	}
 })
+
 
 --Throw In Trash Can Code
 
