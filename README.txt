@@ -44,3 +44,19 @@ c|c|c
 i|g|i
 -----
 i|i|i
+
+
+Contributers:
+
+
+Zeg9:
+
+Made it so you can throw stuff in the trash can (by pressing "q")
+
+
+Mossmanikin:
+
+Made the nodeboxes for the dumpster, the textures for the wooden trash can, and the texture for the dumpster node.  
+(with some editing by me)
+
+
