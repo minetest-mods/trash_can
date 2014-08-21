@@ -55,7 +55,7 @@ minetest.register_node("trash_can:trash_can_wooden",{
 			for i = 1, inv:get_size("main") do
 				inv:set_stack("main", i, nil)
 			end
-			minetest.sound_play("trash", {to_player=player_name, gain = 1.0})
+			minetest.sound_play("trash", {to_player=sender:get_player_name(), gain = 1.0})
 		end
         end,
 })
