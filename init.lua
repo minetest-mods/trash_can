@@ -1,4 +1,31 @@
 --
+-- Functions
+--
+
+local fdir_to_front = {
+	{x=0, z=1},
+	{x=1, z=0},
+	{x=0, z=-1},
+	{x=-1, z=0}
+}
+local function checkwall(pos)
+	local fdir = minetest.get_node(pos).param2
+	local second_node_x = pos.x + fdir_to_front[fdir + 1].x
+	local second_node_z = pos.z + fdir_to_front[fdir + 1].z
+	local second_node_pos = {x=second_node_x, y=pos.y, z=second_node_z}
+	print("x: "..second_node_pos.x)
+	print("y: "..second_node_pos.y)
+	print("z: "..second_node_pos.z)
+	local second_node = minetest.get_node(second_node_pos)
+	if not second_node or not minetest.registered_nodes[second_node.name]
+	  or not minetest.registered_nodes[second_node.name].buildable_to then
+		return true
+	end
+
+	return false
+end
+
+--
 -- Custom Sounds
 --
 function default.node_sound_metal_defaults(table)
@@ -16,27 +43,25 @@ end
 --
 
 local trash_can_nodebox = {
-	{-0.375000,-0.500000,0.312500,0.375000,0.500000,0.375000},
-	{0.312500,-0.500000,-0.375000,0.375000,0.500000,0.375000},
-	{-0.375000,-0.500000,-0.375000,0.375000,0.500000,-0.312500},
-	{-0.375000,-0.500000,-0.375000,-0.312500,0.500000,0.375000},
-	{-0.312500,-0.500000,-0.312500,0.312500,-0.437500,0.312500},
+	{-0.375, -0.5, 0.3125, 0.375, 0.5, 0.375},
+	{0.3125, -0.5, -0.375, 0.375, 0.5, 0.375},
+	{-0.375, -0.5, -0.375, 0.375, 0.5, -0.3125},
+	{-0.375, -0.5, -0.375, -0.3125, 0.5, 0.375},
+	{-0.3125, -0.5, -0.3125, 0.3125, -0.4375, 0.3125},
 }
 
-local dumpster_selectbox = {-0.4375, -0.5, -0.9375, 1.4375, 0.75, 0.4375}
+local dumpster_selectbox = {-0.5, -0.5625, -0.5, 0.5, 0.5, 1.5}
 
 local dumpster_nodebox = {
-	-- Top
-	{-0.4375, 0.75, -0.9375, 1.4375, 0.875, 0.4375},
-	-- Border
-	{-0.5, 0.625 , -1.0, 1.5, 0.75, 0.5},
 	-- Main Body
-	{-0.4375, -0.4375, -0.9375, 1.4375, 0.625, 0.4375},
+	{-0.4375, -0.375, -0.4375, 0.4375, 0.5, 1.4375},
 	-- Feet
-	{-0.4375, -0.5, -0.9375, -0.1875, -0.4375, -0.6875},
-	{1.1875, -0.5, -0.9375, 1.4375, -0.4375, -0.6875},
-	{-0.4375, -0.5, 0.1875, -0.1875, -0.4375, 0.4375},
-	{1.1875, -0.5, 0.1875, 1.4375, -0.4375, 0.4375},
+	{-0.4375, -0.5, -0.4375, -0.25, -0.375, -0.25},
+	{0.25, -0.5, -0.4375, 0.4375, -0.375, -0.25},
+	{0.25, -0.5, 1.25, 0.4375, -0.375, 1.4375},
+	{-0.4375, -0.5, 1.25, -0.25, -0.375, 1.4375},
+	-- Border
+	{-0.5, 0.25, -0.5, 0.5, 0.375, 1.5},
 }
 
 --
@@ -45,17 +70,26 @@ local dumpster_nodebox = {
 
 -- Normal Trash Can
 minetest.register_node("trash_can:trash_can_wooden",{
-	groups = {snappy=1,choppy=2,oddly_breakable_by_hand=2,flammable=3},
-	tiles = {"trash_can_wooden_top.png", "trash_can_wooden_top.png", "trash_can_wooden.png"},
 	description = "Wooden Trash Can",
 	drawtype="nodebox",
 	paramtype = "light",
+	tiles = {
+		"trash_can_wooden_top.png",
+		"trash_can_wooden_top.png",
+		"trash_can_wooden.png"
+	},
 	node_box = {
 		type = "fixed",
 		fixed = trash_can_nodebox
 	},
+	groups = {
+		snappy=1,
+		choppy=2,
+		oddly_breakable_by_hand=2,
+		flammable=3
+	},
 	on_construct = function(pos)
-		local meta = minetest.env:get_meta(pos)
+		local meta = minetest.get_meta(pos)
 		meta:set_string("formspec",
 			"size[8,9]"..
 			"button[0,0;2,1;empty;Empty Trash]"..
@@ -67,7 +101,7 @@ minetest.register_node("trash_can:trash_can_wooden",{
 		inv:set_size("main", 8*4)
 	end,
 	can_dig = function(pos,player)
-		local meta = minetest.env:get_meta(pos);
+		local meta = minetest.get_meta(pos);
 		local inv = meta:get_inventory()
 				return inv:is_empty("main")
 		end,
@@ -126,7 +160,7 @@ minetest.register_node("trash_can:dumpster", {
 	sounds = default.node_sound_metal_defaults(),
 
 	on_construct = function(pos)
-		local meta = minetest.env:get_meta(pos)
+		local meta = minetest.get_meta(pos)
 		meta:set_string("formspec",
 			"size[8,9]"..
 			"button[0,0;2,1;empty;Empty Trash]"..
@@ -137,8 +171,14 @@ minetest.register_node("trash_can:dumpster", {
 		local inv = meta:get_inventory()
 		inv:set_size("main", 8*4)
 	end,
+	after_place_node = function(pos, placer, itemstack)
+		if checkwall(pos) then
+			minetest.set_node(pos, {name = "air"})
+			return true
+		end
+	end,
 	can_dig = function(pos,player)
-		local meta = minetest.env:get_meta(pos);
+		local meta = minetest.get_meta(pos);
 		local inv = meta:get_inventory()
 		return inv:is_empty("main")
 	end,
@@ -163,7 +203,7 @@ minetest.register_node("trash_can:dumpster", {
 			end
 			minetest.sound_play("trash", {to_player=sender:get_player_name(), gain = 2.0})
 		end
-	end,
+	end
 })
 
 --
