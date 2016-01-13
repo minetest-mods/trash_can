@@ -119,9 +119,7 @@ minetest.register_node("trash_can:trash_can_wooden",{
 		if fields.empty then
 			local meta = minetest.get_meta(pos)
 			local inv = meta:get_inventory()
-			for i = 1, inv:get_size("trashlist") do
-				inv:set_stack("trashlist", i, nil)
-			end
+			inv:set_list("trashlist", {})
 			minetest.sound_play("trash", {to_player=sender:get_player_name(), gain = 1.0})
 			minetest.log("action", sender:get_player_name() ..
 				" empties trash can at " .. minetest.pos_to_string(pos))
@@ -198,9 +196,7 @@ minetest.register_node("trash_can:dumpster", {
 		if fields.empty then
 			local meta = minetest.get_meta(pos)
 			local inv = meta:get_inventory()
-			for i = 1, inv:get_size("main") do
-				inv:set_stack("main", i, nil)
-			end
+			inv:set_list("main", {})
 			minetest.sound_play("trash", {to_player=sender:get_player_name(), gain = 2.0})
 		end
 	end

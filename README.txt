@@ -8,7 +8,7 @@
 This mod adds a wooden trash can, and a dumpster to the game.  Right click it, put in your trash, and click the empty trash button.
 You can also throw things in the wooden trash can by pressing "q" or throwing them out of your inventory.
 
-Version: 0.2.1
+Version: 0.2.2
 License: MIT (see LICENSE.txt)
 
 Dependencies:
