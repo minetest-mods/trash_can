@@ -14,6 +14,9 @@ License: MIT (see LICENSE.txt)
 Dependencies:
 default (found in minetest_game)
 
+Please report bugs at the github issue tracker:
+https://github.com/minetest-mods/trash_can/issues
+
 Crafting:
 
 Wooden trash can:
