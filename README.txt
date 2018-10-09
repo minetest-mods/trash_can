@@ -48,5 +48,5 @@ Mossmanikin:
 Made the nodeboxes for the dumpster, the textures for the wooden trash can, and the texture for the dumpster node.
 (with some editing by me). (old)
 
-Minerdudetest:
+Minerdudetest(Minertestdude on Github):
 compatibility with MCL2
