@@ -8,7 +8,9 @@
 This mod adds a wooden trash can, and a dumpster to the game.  Right click it, put in your trash, and click the empty trash button.
 You can also throw things in the wooden trash can by pressing "q" or throwing them out of your inventory.
 
-Version: 0.2.2
+This is a "P" version, based on 0.2.2 enhanced with ability to run with MineClone2 game.
+
+Version: 0.2.2-P
 License: MIT (see LICENSE.txt)
 
 Dependencies:
@@ -46,4 +48,5 @@ Mossmanikin:
 Made the nodeboxes for the dumpster, the textures for the wooden trash can, and the texture for the dumpster node.
 (with some editing by me). (old)
 
-
+Minerdudetest(Minertestdude on Github):
+compatibility with MCL2

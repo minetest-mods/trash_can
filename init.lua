@@ -1,3 +1,27 @@
+-- standard compatibility switcher block.
+
+local moditems = {}  -- switcher
+
+if core.get_modpath("mcl_core") and mcl_core then -- means MineClone 2 is loaded, this is its core mod
+	moditems.IRON_ITEM = "mcl_core:iron_ingot"   -- MCL version of iron ingot
+	moditems.COAL_ITEM = "mcl_core:coalblock" -- MCL version of coal block
+	moditems.GREEN_DYE = "mcl_dye:green" -- MCL version of green dye
+	moditems.METAL_SOUNDS = mcl_sounds.node_sound_metal_defaults()
+	moditems.INFOBOX_CAN = {}
+	moditems.INFOBOX_DUMP = {}
+	moditems.BOXART = "bgcolor[#d0d0d0;false]listcolors[#9d9d9d;#9d9d9d;#5c5c5c;#000000;#ffffff]" -- trying to imitate MCL boxart
+
+else         -- fallback, assume default (MineTest Game) is loaded, otherwise it will error anyway here.
+	moditems.IRON_ITEM = "default:steel_ingot"    -- MTG iron ingot
+	moditems.COAL_ITEM = "default:coalblock"      -- MTG coal block
+	moditems.GREEN_DYE = "dye:dark_green" -- MCL version of green dye
+	moditems.METAL_SOUNDS = default.node_sound_metal_defaults()
+	moditems.INFOBOX_CAN = "Trash Can"
+	moditems.INFOBOX_DUMP = "Dumpster"
+	moditems.BOXART = ""
+end
+
+
 --
 -- Functions
 --
@@ -25,13 +49,13 @@ end
 --
 -- Custom Sounds
 --
-function default.node_sound_metal_defaults(table)
+function moditems.METAL_SOUNDS(table)
 	table = table or {}
 	table.footstep = table.footstep or {name="default_hard_footstep", gain=0.4}
 	table.dig = table.dig or {name="metal_bang", gain=0.6}
 	table.dug = table.dug or {name="default_dug_node", gain=1.0}
 
-	default.node_sound_defaults(table)
+	moditems.METAL_SOUNDS(table)
 	return table
 end
 
@@ -91,9 +115,10 @@ minetest.register_node("trash_can:trash_can_wooden",{
 			"size[8,9]" ..
 			"button[0,0;2,1;empty;Empty Trash]" ..
 			"list[context;trashlist;3,1;2,3;]" ..
-			"list[current_player;main;0,5;8,4;]"
+			"list[current_player;main;0,5;8,4;]" ..
+			moditems.BOXART
 		)
-		meta:set_string("infotext", "Trash Can")
+		meta:set_string("infotext", moditems.INFOBOX_CAN)
 		local inv = meta:get_inventory()
 		inv:set_size("main", 8*4)
 		inv:set_size("trashlist", 2*3)
@@ -155,7 +180,7 @@ minetest.register_node("trash_can:dumpster", {
 		oddly_breakable_by_hand = 1,
 	},
 
-	sounds = default.node_sound_metal_defaults(),
+	sounds = moditems.METAL_SOUNDS,
 
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
@@ -163,9 +188,10 @@ minetest.register_node("trash_can:dumpster", {
 			"size[8,9]" ..
 			"button[0,0;2,1;empty;Empty Trash]" ..
 			"list[context;main;1,1;6,3;]" ..
-			"list[current_player;main;0,5;8,4;]"
+			"list[current_player;main;0,5;8,4;]"..
+			moditems.BOXART
 		)
-		meta:set_string("infotext", "Dumpster")
+		meta:set_string("infotext", moditems.INFOBOX_DUMP)
 		local inv = meta:get_inventory()
 		inv:set_size("main", 8*4)
 	end,
@@ -220,9 +246,9 @@ minetest.register_craft({
 minetest.register_craft({
 	output = 'trash_can:dumpster',
 	recipe = {
-		{'default:coalblock', 'default:coalblock', 'default:coalblock'},
-		{'default:steel_ingot', 'dye:dark_green', 'default:steel_ingot'},
-		{'default:steel_ingot', 'default:steel_ingot', 'default:steel_ingot'},
+		{ moditems.COAL_ITEM, moditems.COAL_ITEM, moditems.COAL_ITEM},
+		{ moditems.IRON_ITEM, moditems.GREEN_DYE, moditems.IRON_ITEM},
+		{ moditems.IRON_ITEM, moditems.IRON_ITEM, moditems.IRON_ITEM},
 	}
 })
 
