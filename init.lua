@@ -1,6 +1,6 @@
 -- standard compatibility switcher block.
 
-moditems = {}  -- switcher
+local moditems = {}  -- switcher
 
 if core.get_modpath("mcl_core") and mcl_core then -- means MineClone 2 is loaded, this is its core mod
 	moditems.IRON_ITEM = "mcl_core:iron_ingot"   -- MCL version of iron ingot
