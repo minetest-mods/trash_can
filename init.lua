@@ -25,14 +25,14 @@ end
 --
 -- Custom Sounds
 --
-function default.node_sound_metal_defaults(table)
-	table = table or {}
-	table.footstep = table.footstep or {name="default_hard_footstep", gain=0.4}
-	table.dig = table.dig or {name="metal_bang", gain=0.6}
-	table.dug = table.dug or {name="default_dug_node", gain=1.0}
-
-	default.node_sound_defaults(table)
-	return table
+local function get_dumpster_sound()
+	local sndtab = {
+		footstep = {name="default_hard_footstep", gain=0.4},
+		dig = {name="metal_bang", gain=0.6},
+		dug = {name="default_dug_node", gain=1.0}
+	}
+	default.node_sound_defaults(sndtab)
+	return sndtab
 end
 
 --
@@ -155,7 +155,7 @@ minetest.register_node("trash_can:dumpster", {
 		oddly_breakable_by_hand = 1,
 	},
 
-	sounds = default.node_sound_metal_defaults(),
+	sounds = get_dumpster_sound(),
 
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
