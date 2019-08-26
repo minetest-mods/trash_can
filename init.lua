@@ -2,6 +2,8 @@
 -- Functions
 --
 
+local trash_can_throw_in = minetest.settings:get_bool("trash_can_throw_in") or false
+
 local fdir_to_front = {
 	{x=0, z=1},
 	{x=1, z=0},
@@ -25,14 +27,14 @@ end
 --
 -- Custom Sounds
 --
-function default.node_sound_metal_defaults(table)
-	table = table or {}
-	table.footstep = table.footstep or {name="default_hard_footstep", gain=0.4}
-	table.dig = table.dig or {name="metal_bang", gain=0.6}
-	table.dug = table.dug or {name="default_dug_node", gain=1.0}
-
-	default.node_sound_defaults(table)
-	return table
+local function get_dumpster_sound()
+	local sndtab = {
+		footstep = {name="default_hard_footstep", gain=0.4},
+		dig = {name="metal_bang", gain=0.6},
+		dug = {name="default_dug_node", gain=1.0}
+	}
+	default.node_sound_defaults(sndtab)
+	return sndtab
 end
 
 --
@@ -155,7 +157,7 @@ minetest.register_node("trash_can:dumpster", {
 		oddly_breakable_by_hand = 1,
 	},
 
-	sounds = default.node_sound_metal_defaults(),
+	sounds = get_dumpster_sound(),
 
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
@@ -230,28 +232,30 @@ minetest.register_craft({
 -- Misc
 --
 
--- Remove any items thrown in trash can.
-local old_on_step = minetest.registered_entities["__builtin:item"].on_step
-minetest.registered_entities["__builtin:item"].on_step = function(self, dtime)
-	local item_pos = self.object:getpos()
-	-- Round the values.  Not essential, but makes logging look nicer.
-	for key, value in pairs(item_pos) do item_pos[key] = math.floor(value + 0.5) end
-	if minetest.get_node(item_pos).name == "trash_can:trash_can_wooden" then
-		local item_stack = ItemStack(self.itemstring)
-		local inv = minetest.get_inventory({type="node", pos=item_pos})
-		local leftover = inv:add_item("trashlist", item_stack)
-		if leftover:get_count() == 0 then
-			self.object:remove()
-			minetest.log("action", item_stack:to_string() ..
-				" added to trash can at " .. minetest.pos_to_string(item_pos))
-		elseif item_stack:get_count() - leftover:get_count() ~= 0 then
-			self.set_item(self, leftover:to_string())
-			minetest.log("action", item_stack:to_string() ..
-				" added to trash can at " .. minetest.pos_to_string(item_pos) ..
-				" with " .. leftover:to_string() .. " left over"
-			)
+if trash_can_throw_in then
+	-- Remove any items thrown in trash can.
+	local old_on_step = minetest.registered_entities["__builtin:item"].on_step
+	minetest.registered_entities["__builtin:item"].on_step = function(self, dtime)
+		local item_pos = self.object:getpos()
+		-- Round the values.  Not essential, but makes logging look nicer.
+		for key, value in pairs(item_pos) do item_pos[key] = math.floor(value + 0.5) end
+		if minetest.get_node(item_pos).name == "trash_can:trash_can_wooden" then
+			local item_stack = ItemStack(self.itemstring)
+			local inv = minetest.get_inventory({type="node", pos=item_pos})
+			local leftover = inv:add_item("trashlist", item_stack)
+			if leftover:get_count() == 0 then
+				self.object:remove()
+				minetest.log("action", item_stack:to_string() ..
+					" added to trash can at " .. minetest.pos_to_string(item_pos))
+			elseif item_stack:get_count() - leftover:get_count() ~= 0 then
+				self.set_item(self, leftover:to_string())
+				minetest.log("action", item_stack:to_string() ..
+					" added to trash can at " .. minetest.pos_to_string(item_pos) ..
+					" with " .. leftover:to_string() .. " left over"
+				)
+			end
+			return
 		end
-		return
+		old_on_step(self, dtime)
 	end
-	old_on_step(self, dtime)
 end
