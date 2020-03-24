@@ -1,6 +1,24 @@
 --
 -- Functions
 --
+local efectsound=""
+if minetest.get_modpath("mcl_sounds") then
+    efectsound = mcl_sounds.node_sound_metal_defaults()
+else
+    --
+    -- Custom Sounds
+    --
+    local function get_dumpster_sound()
+        local sndtab = {
+            footstep = {name="default_hard_footstep", gain=0.4},
+            dig = {name="metal_bang", gain=0.6},
+            dug = {name="default_dug_node", gain=1.0}
+        }        
+        default.node_sound_defaults(sndtab)   
+        return sndtab
+    end
+    efectsound = get_dumpster_sound()
+end
 
 local trash_can_throw_in = minetest.settings:get_bool("trash_can_throw_in") or false
 
@@ -22,19 +40,6 @@ local function checkwall(pos)
 	end
 
 	return false
-end
-
---
--- Custom Sounds
---
-local function get_dumpster_sound()
-	local sndtab = {
-		footstep = {name="default_hard_footstep", gain=0.4},
-		dig = {name="metal_bang", gain=0.6},
-		dug = {name="default_dug_node", gain=1.0}
-	}
-	default.node_sound_defaults(sndtab)
-	return sndtab
 end
 
 --
@@ -155,10 +160,9 @@ minetest.register_node("trash_can:dumpster", {
 	groups = {
 		cracky = 3,
 		oddly_breakable_by_hand = 1,
-	},
-
-	sounds = get_dumpster_sound(),
-
+	},                                       
+    sounds = efectsound,
+                                             
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
 		meta:set_string("formspec",
@@ -219,15 +223,25 @@ minetest.register_craft({
 })
 
 -- Dumpster
-minetest.register_craft({
-	output = 'trash_can:dumpster',
-	recipe = {
-		{'default:coalblock', 'default:coalblock', 'default:coalblock'},
-		{'default:steel_ingot', 'dye:dark_green', 'default:steel_ingot'},
-		{'default:steel_ingot', 'default:steel_ingot', 'default:steel_ingot'},
-	}
-})
-
+if minetest.get_modpath("mcl_core") then
+    minetest.register_craft({
+        output = 'trash_can:dumpster',
+        recipe = {
+            {'mcl_core:coalblock', 'mcl_core:coalblock', 'mcl_core:coalblock'},
+            {'mcl_core:iron_ingot', 'mcl_dye:green', 'mcl_core:iron_ingot'},
+            {'mcl_core:iron_ingot', 'mcl_core:iron_ingot', 'mcl_core:iron_ingot'},
+        }
+    })
+else
+    minetest.register_craft({
+        output = 'trash_can:dumpster',
+        recipe = {
+            {'default:coalblock', 'default:coalblock', 'default:coalblock'},
+            {'default:steel_ingot', 'dye:dark_green', 'default:steel_ingot'},
+            {'default:steel_ingot', 'default:steel_ingot', 'default:steel_ingot'},
+        }
+    })
+end
 --
 -- Misc
 --
