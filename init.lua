@@ -249,9 +249,9 @@ minetest.register_craft({
 minetest.register_craft({
 	output = 'trash_can:dumpster',
 	recipe = {
-		{ moditems.coal_item, moditems.coal_item, moditems.coal_item},
-		{ moditems.iron_item, moditems.green_dye, moditems.iron_item},
-		{ moditems.iron_item, moditems.iron_item, moditems.iron_item},
+		{moditems.coal_item, moditems.coal_item, moditems.coal_item},
+		{moditems.iron_item, moditems.green_dye, moditems.iron_item},
+		{moditems.iron_item, moditems.iron_item, moditems.iron_item},
 	}
 })
 
