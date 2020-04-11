@@ -9,8 +9,8 @@ if mineclone_path then -- means MineClone 2 is loaded, this is its core mod
 	moditems.coal_item = "mcl_core:coalblock" -- MCL version of coal block
 	moditems.green_dye = "mcl_dye:green" -- MCL version of green dye
 	moditems.sounds = mcl_sounds.node_sound_defaults
-	moditems.infobox_can = {}
-	moditems.infobox_dump = {}
+	moditems.infobox_can = nil
+	moditems.infobox_dump = nil
 	moditems.boxart = "bgcolor[#d0d0d0;false]listcolors[#9d9d9d;#9d9d9d;#5c5c5c;#000000;#ffffff]" -- trying to imitate MCL boxart
 
 else -- fallback, assume default (MineTest Game) is loaded, otherwise it will error anyway here.
