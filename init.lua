@@ -1,27 +1,27 @@
 -- standard compatibility switcher block.
 
 local moditems = {}  -- switcher
-local mineclone_path = core.get_modpath("mcl_core") and mcl_core
-local default_path = core.get_modpath("default")
+local mineclone_path = minetest.get_modpath("mcl_core") and mcl_core
 
-if mineclone_path then -- means MineClone 2 is loaded, this is its core mod
-	moditems.iron_item = "mcl_core:iron_ingot"   -- MCL version of iron ingot
-	moditems.coal_item = "mcl_core:coalblock" -- MCL version of coal block
-	moditems.green_dye = "mcl_dye:green" -- MCL version of green dye
+if mineclone_path then -- means MineClone 2 is loaded
+	moditems.iron_item = "mcl_core:iron_ingot" -- MCL version of iron ingot
+	moditems.coal_item = "mcl_core:coalblock"  -- MCL version of coal block
+	moditems.green_dye = "mcl_dye:green"       -- MCL version of green dye
 	moditems.sounds = mcl_sounds.node_sound_defaults
-	moditems.infobox_can = nil
-	moditems.infobox_dump = nil
-	moditems.boxart = "bgcolor[#d0d0d0;false]listcolors[#9d9d9d;#9d9d9d;#5c5c5c;#000000;#ffffff]" -- trying to imitate MCL boxart
+	moditems.trashcan_infotext = nil
+	moditems.dumpster_infotext = nil
+	-- trying to imitate MCL boxart (no getter API)
+	moditems.boxart = "bgcolor[#d0d0d0;false]listcolors[#9d9d9d;#9d9d9d;#5c5c5c;#000000;#ffffff]"
 	moditems.trashbin_groups = {pickaxey=1,axey=1,handy=1,swordy=1,flammable=1,destroy_by_lava_flow=1,craftitem=1}
 	moditems.dumpster_groups = {pickaxey=1,axey=1,handy=1,swordy=1,flammable=0,destroy_by_lava_flow=0,craftitem=1}
 
-else -- fallback, assume default (MineTest Game) is loaded, otherwise it will error anyway here.
-	moditems.iron_item = "default:steel_ingot"    -- MTG iron ingot
-	moditems.coal_item = "default:coalblock"      -- MTG coal block
-	moditems.green_dye = "dye:dark_green" -- MTG version of green dye
+else -- fallback, assume default (Minetest Game) is loaded
+	moditems.iron_item = "default:steel_ingot" -- MTG iron ingot
+	moditems.coal_item = "default:coalblock"   -- MTG coal block
+	moditems.green_dye = "dye:dark_green"      -- MTG version of green dye
 	moditems.sounds = default.node_sound_defaults
-	moditems.infobox_can = "Trash Can"
-	moditems.infobox_dump = "Dumpster"
+	moditems.trashcan_infotext = "Trash Can"
+	moditems.dumpster_infotext = "Dumpster"
 	moditems.boxart = ""
 	moditems.trashbin_groups = {snappy=1,choppy=2,oddly_breakable_by_hand=2,flammable=3}
 	moditems.dumpster_groups = {cracky=3,oddly_breakable_by_hand=1}
@@ -111,6 +111,8 @@ minetest.register_node("trash_can:trash_can_wooden",{
 		fixed = trash_can_nodebox
 	},
 	groups = moditems.trashbin_groups,
+	_mcl_blast_resistance = 5,
+	_mcl_hardness = 1,
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
 		meta:set_string("formspec",
@@ -120,7 +122,7 @@ minetest.register_node("trash_can:trash_can_wooden",{
 			"list[current_player;main;0,5;8,4;]" ..
 			moditems.boxart
 		)
-		meta:set_string("infotext", moditems.infobox_can)
+		meta:set_string("infotext", moditems.trashcan_infotext)
 		local inv = meta:get_inventory()
 		inv:set_size("main", 8*4)
 		inv:set_size("trashlist", 2*3)
@@ -152,8 +154,6 @@ minetest.register_node("trash_can:trash_can_wooden",{
 				" empties trash can at " .. minetest.pos_to_string(pos))
 		end
 	end,
-	_mcl_blast_resistance = 5,
-	_mcl_hardness = 1,
 })
 
 -- Dumpster
@@ -179,6 +179,8 @@ minetest.register_node("trash_can:dumpster", {
 		type = "fixed",
 		fixed = dumpster_nodebox,
 	},
+	_mcl_blast_resistance = 10,
+	_mcl_hardness = 3,
 	groups = moditems.dumpster_groups,
 	sounds = get_dumpster_sound(),
 	on_construct = function(pos)
@@ -190,7 +192,7 @@ minetest.register_node("trash_can:dumpster", {
 			"list[current_player;main;0,5;8,4;]"..
 			moditems.boxart
 		)
-		meta:set_string("infotext", moditems.infobox_dump)
+		meta:set_string("infotext", moditems.dumpster_infotext)
 		local inv = meta:get_inventory()
 		inv:set_size("main", 8*4)
 	end,
@@ -225,8 +227,6 @@ minetest.register_node("trash_can:dumpster", {
 			minetest.sound_play("trash", {to_player=sender:get_player_name(), gain = 2.0})
 		end
 	end,
-	_mcl_blast_resistance = 10,
-	_mcl_hardness = 3,
 })
 
 --
