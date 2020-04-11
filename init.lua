@@ -24,7 +24,7 @@ else -- fallback, assume default (MineTest Game) is loaded, otherwise it will er
 	moditems.infobox_dump = "Dumpster"
 	moditems.boxart = ""
 	moditems.trashbin_groups = {snappy=1,choppy=2,oddly_breakable_by_hand=2,flammable=3}
-	moditems.dumpster_groups = {cracky=3,oddly_breakable_by_hand= 1}
+	moditems.dumpster_groups = {cracky=3,oddly_breakable_by_hand=1}
 end
 
 
