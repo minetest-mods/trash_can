@@ -12,6 +12,8 @@ if mineclone_path then -- means MineClone 2 is loaded, this is its core mod
 	moditems.infobox_can = nil
 	moditems.infobox_dump = nil
 	moditems.boxart = "bgcolor[#d0d0d0;false]listcolors[#9d9d9d;#9d9d9d;#5c5c5c;#000000;#ffffff]" -- trying to imitate MCL boxart
+	moditems.trashbin_groups = {pickaxey=1,axey=1,handy=1,swordy=1,flammable=1,destroy_by_lava_flow=1,craftitem=1}
+	moditems.dumpster_groups = {pickaxey=1,axey=1,handy=1,swordy=1,flammable=0,destroy_by_lava_flow=0,craftitem=1}
 
 else -- fallback, assume default (MineTest Game) is loaded, otherwise it will error anyway here.
 	moditems.iron_item = "default:steel_ingot"    -- MTG iron ingot
@@ -21,6 +23,8 @@ else -- fallback, assume default (MineTest Game) is loaded, otherwise it will er
 	moditems.infobox_can = "Trash Can"
 	moditems.infobox_dump = "Dumpster"
 	moditems.boxart = ""
+	moditems.trashbin_groups = {snappy=1,choppy=2,oddly_breakable_by_hand=2,flammable=3}
+	moditems.dumpster_groups = {cracky=3,oddly_breakable_by_hand= 1}
 end
 
 
@@ -106,12 +110,7 @@ minetest.register_node("trash_can:trash_can_wooden",{
 		type = "fixed",
 		fixed = trash_can_nodebox
 	},
-	groups = {
-		snappy=1,
-		choppy=2,
-		oddly_breakable_by_hand=2,
-		flammable=3
-	},
+	groups = moditems.trashbin_groups,
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
 		meta:set_string("formspec",
@@ -153,6 +152,8 @@ minetest.register_node("trash_can:trash_can_wooden",{
 				" empties trash can at " .. minetest.pos_to_string(pos))
 		end
 	end,
+	_mcl_blast_resistance = 5,
+	_mcl_hardness = 1,
 })
 
 -- Dumpster
@@ -178,13 +179,8 @@ minetest.register_node("trash_can:dumpster", {
 		type = "fixed",
 		fixed = dumpster_nodebox,
 	},
-	groups = {
-		cracky = 3,
-		oddly_breakable_by_hand = 1,
-	},
-
+	groups = moditems.dumpster_groups,
 	sounds = get_dumpster_sound(),
-
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
 		meta:set_string("formspec",
@@ -228,7 +224,9 @@ minetest.register_node("trash_can:dumpster", {
 			inv:set_list("main", {})
 			minetest.sound_play("trash", {to_player=sender:get_player_name(), gain = 2.0})
 		end
-	end
+	end,
+	_mcl_blast_resistance = 10,
+	_mcl_hardness = 3,
 })
 
 --
@@ -249,9 +247,9 @@ minetest.register_craft({
 minetest.register_craft({
 	output = 'trash_can:dumpster',
 	recipe = {
-		{moditems.coal_item, moditems.coal_item, moditems.coal_item},
-		{moditems.iron_item, moditems.green_dye, moditems.iron_item},
-		{moditems.iron_item, moditems.iron_item, moditems.iron_item},
+		{moditems.coal_item,moditems.coal_item,moditems.coal_item},
+		{moditems.iron_item,moditems.green_dye,moditems.iron_item},
+		{moditems.iron_item,moditems.iron_item,moditems.iron_item},
 	}
 })
 
