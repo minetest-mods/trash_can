@@ -263,7 +263,7 @@ minetest.register_craft({
 
 if minetest.settings:get_bool("trash_can_throw_in", false) then
 	minetest.register_abm({
-		label = "Throw items into wooden trasn cans",
+		label = "Throw items into wooden trash cans",
 		nodenames = { "trash_can:trash_can_wooden" },
 		interval = 0.5,
 		chance = 1,
