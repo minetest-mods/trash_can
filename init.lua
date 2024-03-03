@@ -34,8 +34,6 @@ end
 -- Functions
 --
 
-local trash_can_throw_in = minetest.settings:get_bool("trash_can_throw_in") or false
-
 local fdir_to_front = {
 	{x=0, z=1},
 	{x=1, z=0},
@@ -263,31 +261,37 @@ minetest.register_craft({
 -- Misc
 --
 
-if trash_can_throw_in then
-	-- Remove any items thrown in trash can.
-	local old_on_step = minetest.registered_entities["__builtin:item"].on_step
-	minetest.registered_entities["__builtin:item"].on_step = function(self, dtime, ...)
-		local item_pos = self.object:get_pos()
-		item_pos.y = item_pos.y - 0.325
-		item_pos = vector.round(item_pos)
-		-- Round the values.  Not essential, but makes logging look nicer.
-		if minetest.get_node(item_pos).name == "trash_can:trash_can_wooden" then
-			local item_stack = ItemStack(self.itemstring)
-			local inv = minetest.get_inventory({type="node", pos=item_pos})
-			local leftover = inv:add_item("trashlist", item_stack)
-			if leftover:get_count() == 0 then
-				self.object:remove()
-				minetest.log("action", item_stack:to_string() ..
-					" added to trash can at " .. minetest.pos_to_string(item_pos))
-			elseif item_stack:get_count() - leftover:get_count() ~= 0 then
-				self.set_item(self, leftover:to_string())
-				minetest.log("action", item_stack:to_string() ..
-					" added to trash can at " .. minetest.pos_to_string(item_pos) ..
-					" with " .. leftover:to_string() .. " left over"
-				)
+if minetest.settings:get_bool("trash_can_throw_in", false) then
+	minetest.register_abm({
+		label = "Throw items into wooden trasn cans",
+		nodenames = { "trash_can:trash_can_wooden" },
+		interval = 0.5,
+		chance = 1,
+		catch_up = false,
+		action = function(pos, node, active_object_count)
+			-- If no objects, there must be no items
+			if active_object_count == 0 then return end
+
+			local inv = minetest.get_meta(pos):get_inventory()
+
+			for _, object in ipairs(minetest.get_objects_inside_radius(pos, 0.5)) do
+				local luaentity = object:get_luaentity()
+				if luaentity and luaentity.name == "__builtin:item" then
+					local stack = ItemStack(luaentity.itemstring)
+					local leftover = inv:add_item("trashlist", stack)
+					if leftover:get_count() == 0 then
+						object:remove()
+						minetest.log("action", stack:to_string() ..
+							" added to trash can at " .. minetest.pos_to_string(pos))
+					elseif stack:get_count() ~= leftover:get_count() then
+						luaentity:set_item(leftover:to_string())
+						minetest.log("action", stack:to_string() ..
+							" added to trash can at " .. minetest.pos_to_string(pos) ..
+							" with " .. leftover:to_string() .. " left over"
+						)
+					end
+				end
 			end
-			return
 		end
-		old_on_step(self, dtime, ...)
-	end
+	})
 end
