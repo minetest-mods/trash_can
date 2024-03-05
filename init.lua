@@ -4,6 +4,8 @@ local moditems = {}  -- switcher
 local mineclone_path = minetest.get_modpath("mcl_core") and mcl_core
 local S = minetest.get_translator("trash_can")
 
+local trash_can_throw_in = minetest.settings:get_bool("trash_can_throw_in", false)
+
 if mineclone_path then -- means MineClone 2 is loaded
 	moditems.iron_item = "mcl_core:iron_ingot" -- MCL version of iron ingot
 	moditems.coal_item = "mcl_core:coalblock"  -- MCL version of coal block
@@ -33,8 +35,6 @@ end
 --
 -- Functions
 --
-
-local trash_can_throw_in = minetest.settings:get_bool("trash_can_throw_in") or false
 
 local fdir_to_front = {
 	{x=0, z=1},
@@ -130,7 +130,37 @@ minetest.register_node("trash_can:trash_can_wooden",{
 		local inv = meta:get_inventory()
 		inv:set_size("main", 8*4)
 		inv:set_size("trashlist", 2*3)
+
+		if trash_can_throw_in then
+			local timer = minetest.get_node_timer(pos)
+			timer:start(0)
+		end
 	end,
+	on_timer = trash_can_throw_in and function(pos)
+		local inv = minetest.get_meta(pos):get_inventory()
+
+		for _, object in ipairs(minetest.get_objects_inside_radius(pos, 0.5)) do
+			local luaentity = object:get_luaentity()
+			if luaentity and luaentity.name == "__builtin:item" then
+				local stack = ItemStack(luaentity.itemstring)
+				local leftover = inv:add_item("trashlist", stack)
+				if leftover:get_count() == 0 then
+					object:remove()
+					minetest.log("action", stack:to_string() ..
+						" added to trash can at " .. minetest.pos_to_string(pos))
+				elseif stack:get_count() ~= leftover:get_count() then
+					luaentity:set_item(leftover:to_string())
+					minetest.log("action", stack:to_string() ..
+						" added to trash can at " .. minetest.pos_to_string(pos) ..
+						" with " .. leftover:to_string() .. " left over"
+					)
+				end
+			end
+		end
+
+		local timer = minetest.get_node_timer(pos)
+		timer:start(0.5)
+	end or nil,
 	can_dig = function(pos,player)
 		local meta = minetest.get_meta(pos);
 		local inv = meta:get_inventory()
@@ -264,30 +294,14 @@ minetest.register_craft({
 --
 
 if trash_can_throw_in then
-	-- Remove any items thrown in trash can.
-	local old_on_step = minetest.registered_entities["__builtin:item"].on_step
-	minetest.registered_entities["__builtin:item"].on_step = function(self, dtime, ...)
-		local item_pos = self.object:get_pos()
-		item_pos.y = item_pos.y - 0.325
-		item_pos = vector.round(item_pos)
-		-- Round the values.  Not essential, but makes logging look nicer.
-		if minetest.get_node(item_pos).name == "trash_can:trash_can_wooden" then
-			local item_stack = ItemStack(self.itemstring)
-			local inv = minetest.get_inventory({type="node", pos=item_pos})
-			local leftover = inv:add_item("trashlist", item_stack)
-			if leftover:get_count() == 0 then
-				self.object:remove()
-				minetest.log("action", item_stack:to_string() ..
-					" added to trash can at " .. minetest.pos_to_string(item_pos))
-			elseif item_stack:get_count() - leftover:get_count() ~= 0 then
-				self.set_item(self, leftover:to_string())
-				minetest.log("action", item_stack:to_string() ..
-					" added to trash can at " .. minetest.pos_to_string(item_pos) ..
-					" with " .. leftover:to_string() .. " left over"
-				)
-			end
-			return
+	minetest.register_lbm({
+		label = "Start node timer of previously placed trash cans",
+		name = "trash_can:trash_can_wooden_timer",
+		nodenames = { "trash_can:trash_can_wooden" },
+		run_at_every_load = false,
+		action = function(pos)
+			local timer = minetest.get_node_timer(pos)
+			timer:start(0)
 		end
-		old_on_step(self, dtime, ...)
-	end
+	})
 end
